@@ -1,0 +1,31 @@
+name: React CI with Docker
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Build Docker image
+      - name: Build Docker image
+        run: docker build -t react-app:ci .
+
+      # Test Docker container
+      - name: Test Docker container
+        run: |
+          docker run -d -p 3000:3000 --name react-test react-app:ci
+          sleep 10
+          docker logs react-test
+          docker stop react-test
+          docker rm react-test
